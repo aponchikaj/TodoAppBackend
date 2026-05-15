@@ -14,7 +14,7 @@ router.get('/todos',checkAuth,async(req,res)=>{
 
     try{
         
-        const filter = {user: req.user._id};
+        const filter = {userID: req.user._id};
 
         if (status && ["To Do","In Progress","Done"].includes(status)) {
             filter.status = status
@@ -26,8 +26,8 @@ router.get('/todos',checkAuth,async(req,res)=>{
 
         if (search && search.trim()) {
             filter.$or = [
-                { title: { $regex: search.trim(), $options: 'i' } },
-                { description: { $regex: search.trim(), $options: 'i' } },
+                { todoTitle: { $regex: search.trim(), $options: 'i' } },
+                { todoDescription: { $regex: search.trim(), $options: 'i' } },
             ]
         }
 
@@ -133,13 +133,11 @@ router.put('/todos/:id',checkAuth,async(req,res)=>{
         const TODO = await TODOS.findOne({userID:req.user._id,_id:id});
         if(!TODO) return res.send({Success:false,Message:"Todo not found."});
 
-        await TODOS.findOneAndUpdate({
-            todoTitle: title.trim(),
-            todoDescription: description?.trim() || '',
-            status: status || 'To Do',
-            priority: priority || 'medium',
-            dueDate: dueDate || null,
-        })
+        await TODOS.findOneAndUpdate(
+            { _id: id, userID: req.user._id },
+            { $set: { todoTitle: title.trim(), todoDescription: description?.trim() || '', status, priority, dueDate: dueDate || null } },
+            { new: true }
+        )
 
         return res.send({Success:true,Message:"Saved."})
 
