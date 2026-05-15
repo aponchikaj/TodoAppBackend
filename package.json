@@ -12,6 +12,7 @@
   "author": "Lazare Mirziashvili",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
     "cookie-parser": "^1.4.7",
@@ -19,9 +20,11 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.2.0",
-    "mongoose": "^9.6.2"
+    "mongoose": "^9.6.2",
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
     "jest": "^30.4.2",
