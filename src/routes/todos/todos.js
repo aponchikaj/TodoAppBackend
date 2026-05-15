@@ -75,9 +75,9 @@ router.post('/todos',checkAuth,async(req,res)=>{
     if (!title || title.trim().length === 0) return res.send({ Success: false, Message: 'Title is required.' });
     
     if(title.trim().length> 200) return res.send({ Success: false, Message: 'Title too long.'})
-    if (status &&!['To Do','In Progress','Done'].includes(status)) return res.send({ Success: false, Message: 'Invalid status.'})
-    if (priority&&!['low','medium','high'].includes(priority)) return res.send({ Success: false, Message: 'Invalid priority.'})
-    if (dueDate&&new Date(dueDate) <new Date().setHours(0, 0, 0, 0)) return res.send({ Success: false, Message: 'Due date cannot be in the past.'})
+    if(status &&!['To Do','In Progress','Done'].includes(status)) return res.send({ Success: false, Message: 'Invalid status.'})
+    if(priority&&!['low','medium','high'].includes(priority)) return res.send({ Success: false, Message: 'Invalid priority.'})
+    if(dueDate&&new Date(dueDate) <new Date().setHours(0, 0, 0, 0)) return res.send({ Success: false, Message: 'Due date cannot be in the past.'})
 
     try{
 
@@ -104,7 +104,8 @@ router.get('/todos/:id',checkAuth,async(req,res)=>{
     if(!id || !mongoose.Types.ObjectId.isValid(id)) return res.send({Success:false,Message:"Invalid todo id."})
 
     try{
-        const TODO = await TODOS.findOne({userID:req.user._id,_id:id})
+        const TODO = await TODOS.findOne({userID:req.user._id,_id:id});
+        if(!TODO) return res.send({Success:false,Message:"Todo not found."})
 
         return res.send({Success:false,Message:TODO})
 
@@ -117,11 +118,30 @@ router.get('/todos/:id',checkAuth,async(req,res)=>{
 router.put('/todos/:id',checkAuth,async(req,res)=>{
     const {id} =req.body;
 
+    const {title,description,status,priority,dueDate} = req.body
+
     if(!id || !mongoose.Types.ObjectId.isValid(id)) return res.send({Success:false,Message:"Invalid todo id."})
+
+    if(!title || title.trim().length === 0) return res.send({ Success: false, Message: 'Title is required.' });
+    if(title.trim().length> 200) return res.send({ Success: false, Message: 'Title too long.'})
+    if(status &&!['To Do','In Progress','Done'].includes(status)) return res.send({ Success: false, Message: 'Invalid status.'})
+    if(priority&&!['low','medium','high'].includes(priority)) return res.send({ Success: false, Message: 'Invalid priority.'})
+    if(dueDate&&new Date(dueDate) <new Date().setHours(0, 0, 0, 0)) return res.send({ Success: false, Message: 'Due date cannot be in the past.'})
 
     try{
 
-        
+        const TODO = await TODOS.findOne({userID:req.user._id,_id:id});
+        if(!TODO) return res.send({Success:false,Message:"Todo not found."});
+
+        await TODOS.findOneAndUpdate({
+            todoTitle: title.trim(),
+            todoDescription: description?.trim() || '',
+            status: status || 'To Do',
+            priority: priority || 'medium',
+            dueDate: dueDate || null,
+        })
+
+        return res.send({Success:false,Message:"Saved."})
 
     }catch(e){
         await newError(e,FileLocation)
@@ -130,7 +150,22 @@ router.put('/todos/:id',checkAuth,async(req,res)=>{
 })
 
 router.delete('/todos/:id',checkAuth,async(req,res)=>{
+    const {id} = req.body;
 
+    if(!id || !mongoose.Types.ObjectId.isValid(id)) return res.send({Success:false,Message:"Invalid todo id."})
+    try{
+        
+        const TODO = await TODOS.findOne({_id:id,userID:req.user._id})
+        if(!TODO) return res.send({Success:false,Message:"Todo not found."});
+
+        TODOS.findOneAndDelete({_id:id});
+
+        return res.send({Success:true,Message:"Deleted."})
+
+    }catch(e){
+        await newError(e,FileLocation)
+        return res.send({Success:false,Message:"Server error."})
+    }
 })
 
 export default router;

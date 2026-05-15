@@ -8,6 +8,8 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 
 import authRouter from './src/routes/auth/auth.js'
+import todoRouter from './src/routes/todos/todos.js'
+import userRouter from './src/routes/user/user.js'
 
 dotenv.config()
 
@@ -21,6 +23,8 @@ app.use(helmet())
 app.use(morgan('dev'))
 
 app.use('/api/auth',authRouter);
+app.use('/api',todoRouter)
+app.use('/api',userRouter)
 
 mongoose.connect(process.env.MONGO_STRING).then(()=>{
     app.listen(PORT,()=> console.log("Server is running !"));

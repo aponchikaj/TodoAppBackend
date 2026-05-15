@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import USERS from '../models/user.model';
+import USERS from '../models/user.model.js';
 
 const checkAuth = async(req,res,next)=>{
     try{
