@@ -107,7 +107,7 @@ router.get('/todos/:id',checkAuth,async(req,res)=>{
         const TODO = await TODOS.findOne({userID:req.user._id,_id:id});
         if(!TODO) return res.send({Success:false,Message:"Todo not found."})
 
-        return res.send({Success:false,Message:TODO})
+        return res.send({Success:true,Message:TODO})
 
     }catch(e){
         await newError(e,FileLocation)
@@ -116,7 +116,7 @@ router.get('/todos/:id',checkAuth,async(req,res)=>{
 })
 
 router.put('/todos/:id',checkAuth,async(req,res)=>{
-    const {id} =req.body;
+    const {id} =req.params;
 
     const {title,description,status,priority,dueDate} = req.body
 
@@ -141,7 +141,7 @@ router.put('/todos/:id',checkAuth,async(req,res)=>{
             dueDate: dueDate || null,
         })
 
-        return res.send({Success:false,Message:"Saved."})
+        return res.send({Success:true,Message:"Saved."})
 
     }catch(e){
         await newError(e,FileLocation)
@@ -150,7 +150,7 @@ router.put('/todos/:id',checkAuth,async(req,res)=>{
 })
 
 router.delete('/todos/:id',checkAuth,async(req,res)=>{
-    const {id} = req.body;
+    const {id} = req.params;
 
     if(!id || !mongoose.Types.ObjectId.isValid(id)) return res.send({Success:false,Message:"Invalid todo id."})
     try{
@@ -158,7 +158,7 @@ router.delete('/todos/:id',checkAuth,async(req,res)=>{
         const TODO = await TODOS.findOne({_id:id,userID:req.user._id})
         if(!TODO) return res.send({Success:false,Message:"Todo not found."});
 
-        TODOS.findOneAndDelete({_id:id});
+        await TODOS.findOneAndDelete({_id:id});
 
         return res.send({Success:true,Message:"Deleted."})
 
