@@ -1,7 +1,7 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 
-process.env.JWT_SECRET = 'Lazare2010';
+process.env.JWT_SECRET = '-testing-testing-testing-';
 process.env.NODE_ENV = 'test';
 
 let mongo;
